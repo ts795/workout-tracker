@@ -24,4 +24,16 @@ router.get('/', async (req, res) => {
   });
 });
 
+// Add an exercise to a workout
+router.put('/:id', async (req, res) => {
+  db.workouts.update({ "_id": mongojs.ObjectId(req.params.id) }, { $push: {"exercises": req.body} }, (err, data) => {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(data);
+      res.json(data);
+    }
+  })
+});
+
 module.exports = router;
