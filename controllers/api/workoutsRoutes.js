@@ -44,4 +44,24 @@ router.post('/', async (req, res) => {
   })
 }
 );
+
+// Get workouts for last 7 days
+router.get('/range', async (req, res) => {
+  // Use $addFields to get the total duration for the workout https://docs.mongodb.com/manual/reference/operator/aggregation/addFields/#mongodb-pipeline-pipe.-addFields
+  Workout.aggregate([
+    { $addFields: { totalDuration: { $sum: "$exercises.duration" } } },
+    {$sort: {day: -1}}, // Get the newest results
+    {$limit: 7 },  // Limit the results to the last 7 workouts
+    {$sort: {day: 1}} // Put the oldest one at the end
+  ],
+    (err, data) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log(data);
+        res.json(data);
+      }
+    });
+});
+
 module.exports = router;
